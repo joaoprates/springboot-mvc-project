@@ -13,8 +13,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/health").permitAll() // Permitir acesso público ao /health
-                        .anyRequest().authenticated()           // Requer autenticação para outros endpoints
+                        .requestMatchers(
+                                "/health",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll() // Permitir acesso público ao /health e rotas do Swagger
+                        .anyRequest().authenticated() // Requer autenticação para outros endpoints
                 )
                 .csrf(AbstractHttpConfigurer::disable); // Opcional: desabilita proteção CSRF (não recomendado em produção)
         return http.build();

@@ -1,4 +1,4 @@
-package com.pratesdev.demo;
+package com.pratesdev;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
