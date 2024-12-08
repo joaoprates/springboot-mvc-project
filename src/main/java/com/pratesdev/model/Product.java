@@ -1,3 +1,4 @@
+// src/main/java/com/pratesdev/model/Product.java
 package com.pratesdev.model;
 
 import jakarta.persistence.*;
@@ -10,8 +11,13 @@ public class Product {
     private String name;
     private String description;
     private double price;
-    private String category;
-    private boolean available;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @Column(nullable = false)
+    private Boolean available = false;
 
     // Getters and setters
     public Long getId() {
@@ -46,19 +52,20 @@ public class Product {
         this.price = price;
     }
 
-    public String getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(Category category) {
         this.category = category;
     }
 
-    public boolean isAvailable() {
+    public Boolean getAvailable() {
         return available;
     }
 
-    public void setAvailable(boolean available) {
+    public void setAvailable(Boolean available) {
         this.available = available;
     }
+
 }

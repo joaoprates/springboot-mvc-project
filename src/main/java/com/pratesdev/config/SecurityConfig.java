@@ -19,7 +19,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/swagger-resources/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/products/**"
                         ).permitAll() // Permitir acesso público ao /health e rotas do Swagger
                         .anyRequest().authenticated() // Requer autenticação para outros endpoints
                 )

@@ -1,5 +1,7 @@
 package com.pratesdev.controller;
 
+import com.pratesdev.dto.ProductResponse;
+import com.pratesdev.model.Category;
 import com.pratesdev.model.Product;
 import com.pratesdev.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +19,52 @@ public class ProductController {
 
     // 1. List all products
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
         List<Product> products = productService.getAllProducts();
-        return ResponseEntity.ok(products);
+        // Testando diretamente no mapeamento
+        for (Product product : products) {
+            // Teste do trecho
+            Category category = product.getCategory();
+            String categoryName = category != null ? category.getNameCategory() : null;
+
+            // Imprimindo o resultado para debug
+            System.out.println("Product ID: " + product.getId());
+            System.out.println("Category Object: " + category);
+            System.out.println("Category Name: " + categoryName);
+        }
+
+        // Mapear produtos para ProductResponse
+        List<ProductResponse> productResponses = products.stream()
+                .map(product -> new ProductResponse(
+                        product.getId(),
+                        product.getName(),
+                        product.getDescription(),
+                        product.getPrice(),
+                        product.getCategory() != null ? product.getCategory().getNameCategory(): null,
+                        product.getAvailable()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(productResponses);
     }
+
 
     // 2. Get a product by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         Product product = productService.getProductById(id);
-        return ResponseEntity.ok(product);
+
+        // Converter Product para ProductResponse
+        ProductResponse response = new ProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getCategory() != null ? product.getCategory().getNameCategory() : null,
+                product.getAvailable()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     // 3. Add a new product

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -18,6 +17,10 @@ public class ProductService {
     // 1. List all products
     public List<Product> getAllProducts() {
         return productRepository.findAll();
+    }
+
+    public List<Product> getProductsByCategoryName(String categoryName) {
+        return productRepository.findByCategoryNameIgnoreCase(categoryName);
     }
 
     // 2. Get a product by ID
@@ -40,7 +43,7 @@ public class ProductService {
         existingProduct.setName(productDetails.getName());
         existingProduct.setCategory(productDetails.getCategory());
         existingProduct.setPrice(productDetails.getPrice());
-        existingProduct.setAvailable(productDetails.isAvailable());
+        existingProduct.setAvailable(productDetails.getAvailable());
 
         return productRepository.save(existingProduct);
     }
@@ -57,7 +60,7 @@ public class ProductService {
         if (name != null) {
             return productRepository.findByNameContainingIgnoreCase(name);
         } else if (category != null) {
-            return productRepository.findByCategoryIgnoreCase(category);
+            return productRepository.findByCategoryNameIgnoreCase(category);
         } else if (available != null) {
             return productRepository.findByAvailable(available);
         }
