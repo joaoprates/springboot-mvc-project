@@ -1,10 +1,13 @@
 package com.pratesdev.controller;
 
+import com.pratesdev.dto.ProductCreateRequest;
 import com.pratesdev.dto.ProductResponse;
+import com.pratesdev.dto.ProductUpdateRequest;
 import com.pratesdev.model.Category;
 import com.pratesdev.model.Product;
 import com.pratesdev.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,19 +24,19 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         List<Product> products = productService.getAllProducts();
-        // Testando diretamente no mapeamento
+        // Testing directly in the mapping
         for (Product product : products) {
-            // Teste do trecho
+            // Test snippet
             Category category = product.getCategory();
             String categoryName = category != null ? category.getNameCategory() : null;
 
-            // Imprimindo o resultado para debug
+            // Printing the result for debugging
             System.out.println("Product ID: " + product.getId());
             System.out.println("Category Object: " + category);
             System.out.println("Category Name: " + categoryName);
         }
 
-        // Mapear produtos para ProductResponse
+        // Map products to ProductResponse
         List<ProductResponse> productResponses = products.stream()
                 .map(product -> new ProductResponse(
                         product.getId(),
@@ -48,13 +51,12 @@ public class ProductController {
         return ResponseEntity.ok(productResponses);
     }
 
-
     // 2. Get a product by ID
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         Product product = productService.getProductById(id);
 
-        // Converter Product para ProductResponse
+        // Convert Product to ProductResponse
         ProductResponse response = new ProductResponse(
                 product.getId(),
                 product.getName(),
@@ -69,15 +71,31 @@ public class ProductController {
 
     // 3. Add a new product
     @PostMapping
-    public ResponseEntity<Product> addProduct(@RequestBody Product product) {
-        Product createdProduct = productService.addProduct(product);
-        return ResponseEntity.ok(createdProduct);
+    public ResponseEntity<Product> createProduct(@RequestBody ProductCreateRequest request) {
+        // Criação do produto
+        Product newProduct = productService.createProduct(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newProduct);
     }
+
 
     // 4. Update an existing product
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        Product updatedProduct = productService.updateProduct(id, product);
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody ProductUpdateRequest request) {
+        // Fetch the existing product
+        Product product = productService.getProductById(id);
+
+        // Update product fields
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setAvailable(request.getAvailable());
+
+        // Update category via service
+        productService.updateCategory(product, request.getCategory());
+
+        // Save the updated product
+        Product updatedProduct = productService.updateProduct(product);
+
         return ResponseEntity.ok(updatedProduct);
     }
 

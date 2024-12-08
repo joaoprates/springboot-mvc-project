@@ -1,10 +1,18 @@
 package com.pratesdev.service;
 
+import com.pratesdev.dto.ProductCreateRequest;
+import com.pratesdev.dto.ProductUpdateRequest;
 import com.pratesdev.exception.ResourceNotFoundException;
+import com.pratesdev.model.Category;
 import com.pratesdev.model.Product;
+import com.pratesdev.repository.CategoryRepository;
 import com.pratesdev.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -13,6 +21,8 @@ public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     // 1. List all products
     public List<Product> getAllProducts() {
@@ -34,19 +44,39 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    // 4. Update an existing product
-    public Product updateProduct(Long id, Product productDetails) {
-        Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+    public Product createProduct(ProductCreateRequest request) {
+        // Buscar a categoria pelo nome
+        Category category = categoryRepository.findByName(request.getCategory())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
-        // Update product details
-        existingProduct.setName(productDetails.getName());
-        existingProduct.setCategory(productDetails.getCategory());
-        existingProduct.setPrice(productDetails.getPrice());
-        existingProduct.setAvailable(productDetails.getAvailable());
+        // Criar o novo produto
+        Product product = new Product();
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setAvailable(request.getAvailable());
+        product.setCategory(category);
 
-        return productRepository.save(existingProduct);
+        // Salvar no banco de dados
+        return productRepository.save(product);
     }
+
+
+    // 4. Update an existing product
+    public void updateCategory(Product product, String categoryName) {
+        if (categoryName != null && !categoryName.isEmpty()) {
+            Category category = categoryRepository.findByName(categoryName)
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found: " + categoryName));
+            product.setCategory(category);
+        } else {
+            product.setCategory(null); // Caso a categoria não seja fornecida
+        }
+    }
+
+    public Product updateProduct(Product product) {
+        return productRepository.save(product);
+    }
+
 
     // 5. Delete a product
     public void deleteProduct(Long id) {
