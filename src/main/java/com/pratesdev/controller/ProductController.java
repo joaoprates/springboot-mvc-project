@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -20,6 +22,8 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+
     // 1. List all products
     @GetMapping
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
@@ -29,11 +33,7 @@ public class ProductController {
             // Test snippet
             Category category = product.getCategory();
             String categoryName = category != null ? category.getNameCategory() : null;
-
-            // Printing the result for debugging
-            System.out.println("Product ID: " + product.getId());
-            System.out.println("Category Object: " + category);
-            System.out.println("Category Name: " + categoryName);
+            logger.info("Product: {}, Category: {}", product.getName(), categoryName);
         }
 
         // Map products to ProductResponse
@@ -73,6 +73,7 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody ProductCreateRequest request) {
         // Criação do produto
+        logger.info("Received ProductCreateRequest: {}", request);
         Product newProduct = productService.createProduct(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(newProduct);
     }

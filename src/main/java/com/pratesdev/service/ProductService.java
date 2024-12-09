@@ -8,11 +8,13 @@ import com.pratesdev.model.Product;
 import com.pratesdev.repository.CategoryRepository;
 import com.pratesdev.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -46,8 +48,12 @@ public class ProductService {
 
     public Product createProduct(ProductCreateRequest request) {
         // Buscar a categoria pelo nome
+        if (request.getCategory() == null || request.getCategory().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Category cannot be null or empty");
+        }
+
         Category category = categoryRepository.findByName(request.getCategory())
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid category ID"));
 
         // Criar o novo produto
         Product product = new Product();
