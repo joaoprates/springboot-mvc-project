@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -82,6 +83,11 @@ public class ProductController {
     // 4. Update an existing product
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody ProductUpdateRequest request) {
+        // Validate required fields
+        if (request.getName() == null || request.getPrice() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name and Price are required");
+        }
+
         // Fetch the existing product
         Product product = productService.getProductById(id);
 
