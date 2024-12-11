@@ -13,17 +13,16 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
-    // Buscar produtos pelo nome
+    // Search products by name
     List<Product> findByNameContainingIgnoreCase(String name);
 
-    // Buscar produtos pela categoria
+    // Search products by category
     List<Product> findByCategory(Category category);
 
-    // Buscar produtos pela disponibilidade
+    // Search products by availability
     List<Product> findByAvailable(Boolean available);
 
-    // Buscar produtos com base no nome da categoria
+    // Search products based on category name
     @Query("SELECT p FROM Product p WHERE LOWER(p.category.name) = LOWER(:categoryName)")
     List<Product> findByCategoryNameIgnoreCase(@Param("categoryName") String categoryName);
 }
-
